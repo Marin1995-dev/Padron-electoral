@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Egresados Unidos por Facen - Consulta de Padrón Electoral</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 20%, #fff3cd 80%, #f0f8ff 100%);
+            color: #333;
+            padding: 40px 20px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: repeating-linear-gradient(
+                45deg,
+                transparent,
+                transparent 20px,
+                rgba(255,255,255,0.1) 20px,
+                rgba(255,255,255,0.1) 40px
+            );
+            animation: slide 30s linear infinite;
+        }
+
+        @keyframes slide {
+            0% { transform: translateX(-50px); }
+            100% { transform: translateX(0); }
+        }
+
+        .logo-container {
+            margin-bottom: 30px;
+            animation: float 4s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-8px); }
+        }
+
+        .official-logo {
+            display: inline-block;
+            position: relative;
+            z-index: 2;
+        }
+
+        .logo-text {
+            position: relative;
+        }
+
+        .logo-main {
+            font-size: 3.5em;
+            font-weight: 900;
+            letter-spacing: 0.1em;
+            color: #000;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 5px;
+        }
+
+        .logo-sub {
+            font-size: 1.2em;
+            font-weight: 600;
+            letter-spacing: 0.15em;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .logo-underline {
+            width: 60%;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, #333, transparent);
+            margin: 0 auto;
+            border-radius: 2px;
+        }
+
+        .header h2 {
+            font-size: 1.8em;
+            margin-bottom: 10px;
+            position: relative;
+            z-index: 1;
+            color: #2E7D32;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+        }
+
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.8;
+            position: relative;
+            z-index: 1;
+            color: #555;
+        }
+
+        .main-content {
+            padding: 40px 20px;
+        }
+
+        .upload-section {
+            background: #f8f9fa;
+            border: 2px dashed #ddd;
+            border-radius: 15px;
+            padding: 30px;
+            text-align: center;
+            margin-bottom: 30px;
+            transition: all 0.3s ease;
+        }
+
+        .upload-section:hover {
+            border-color: #4CAF50;
+            background: #f0f8f0;
+        }
+
+        .upload-section.dragover {
+            border-color: #4CAF50;
+            background: #e8f5e8;
+            transform: scale(1.02);
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        .upload-button {
+            background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 25px;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 15px;
+            display: inline-block;
+        }
+
+        .upload-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(76, 175, 80, 0.3);
+        }
+
+        .search-section {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .search-form {
+            display: flex;
+            gap: 15px;
+            align-items: end;
+        }
+
+        .form-group {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group label {
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .form-group input {
+            padding: 12px 15px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            font-size: 1em;
+            transition: all 0.3s ease;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #4CAF50;
+            box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.1);
+        }
+
+        .search-button {
+            background: linear-gradient(135deg, #2196F3 0%, #1976D2 100%);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 10px;
+            font-size: 1em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            height: fit-content;
+        }
+
+        .search-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(33, 150, 243, 0.3);
+        }
+
+        .results-section {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            display: none;
+        }
+
+        .result-card {
+            background: linear-gradient(135deg, #e8f5e8 0%, #f0f8f0 100%);
+            border: 2px solid #4CAF50;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .result-card.not-found {
+            background: linear-gradient(135deg, #ffebee 0%, #fce4ec 100%);
+            border-color: #f44336;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .result-status {
+            font-size: 1.3em;
+            font-weight: bold;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+        }
+
+        .status-icon {
+            margin-right: 10px;
+            font-size: 1.5em;
+        }
+
+        .result-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+        }
+
+        .detail-item {
+            background: rgba(255,255,255,0.7);
+            padding: 15px;
+            border-radius: 10px;
+        }
+
+        .detail-label {
+            font-weight: bold;
+            color: #555;
+            margin-bottom: 5px;
+        }
+
+        .detail-value {
+            color: #333;
+            font-size: 1.1em;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            border: 1px solid #dee2e6;
+        }
+
+        .stat-number {
+            font-size: 2em;
+            font-weight: bold;
+            color: #4CAF50;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #4CAF50;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 768px) {
+            .search-form {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .logo-main {
+                font-size: 2.5em;
+            }
+            
+            .logo-sub {
+                font-size: 1em;
+            }
+            
+            .header h2 {
+                font-size: 1.4em;
+            }
+            
+            .result-details {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo-container">
+                <div class="official-logo">
+                    <div class="logo-text">
+                        <div class="logo-main">EGRESADOS</div>
+                        <div class="logo-sub">• UNIDOS POR FACEN •</div>
+                        <div class="logo-underline"></div>
+                    </div>
+                </div>
+            </div>
+            <h2>Consulta de Padrón Electoral</h2>
+            <p>Verificá si estás habilitado para votar en nuestras elecciones</p>
+        </div>
+
+        <div class="main-content">
+            <div class="upload-section" id="uploadSection">
+                <h3>📂 Cargar Base de Datos</h3>
+                <p>Arrastrá tu archivo CSV aquí o hacé clic para seleccionarlo</p>
+                <button class="upload-button" onclick="document.getElementById('fileInput').click()">
+                    Seleccionar Archivo CSV
+                </button>
+                <input type="file" id="fileInput" class="file-input" accept=".csv" onchange="handleFileUpload(event)">
+                <p style="margin-top: 10px; color: #666; font-size: 0.9em;">
+                    Formato requerido: nombre, apellido, cedula, direccion, etc.
+                </p>
+                <div id="uploadStatus"></div>
+            </div>
+
+            <div class="search-section">
+                <h3>🔍 Buscar en el Padrón</h3>
+                <form class="search-form" onsubmit="searchPadron(event)">
+                    <div class="form-group">
+                        <label for="searchCedula">Número de Cédula:</label>
+                        <input type="text" id="searchCedula" placeholder="Ej: 12345678" required>
+                    </div>
+                    <button type="submit" class="search-button">Buscar</button>
+                </form>
+            </div>
+
+            <div class="results-section" id="resultsSection">
+                <div id="searchResults"></div>
+            </div>
+
+            <div class="stats" id="statsSection" style="display: none;">
+                <div class="stat-card">
+                    <div class="stat-number" id="totalRecords">0</div>
+                    <div class="stat-label">Total de Registros</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="lastSearch">-</div>
+                    <div class="stat-label">Última Búsqueda</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let padronData = [];
+        let isFileLoaded = false;
+
+        // Configurar drag and drop
+        const uploadSection = document.getElementById('uploadSection');
+        
+        uploadSection.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadSection.classList.add('dragover');
+        });
+        
+        uploadSection.addEventListener('dragleave', (e) => {
+            e.preventDefault();
+            uploadSection.classList.remove('dragover');
+        });
+        
+        uploadSection.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadSection.classList.remove('dragover');
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                handleFileUpload({ target: { files: files } });
+            }
+        });
+
+        function handleFileUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const uploadStatus = document.getElementById('uploadStatus');
+            uploadStatus.innerHTML = '<div class="loading"><div class="spinner"></div>Procesando archivo...</div>';
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const csv = e.target.result;
+                    parseCSV(csv);
+                    uploadStatus.innerHTML = '<div style="color: #4CAF50; margin-top: 15px;">✅ Archivo cargado correctamente</div>';
+                    isFileLoaded = true;
+                    updateStats();
+                } catch (error) {
+                    uploadStatus.innerHTML = '<div style="color: #f44336; margin-top: 15px;">❌ Error al procesar el archivo</div>';
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        function parseCSV(csv) {
+            const lines = csv.split('\n');
+            const headers = lines[0].split(',').map(h => h.trim().toLowerCase());
+            
+            padronData = [];
+            for (let i = 1; i < lines.length; i++) {
+                if (lines[i].trim()) {
+                    const values = lines[i].split(',');
+                    const record = {};
+                    headers.forEach((header, index) => {
+                        record[header] = values[index]?.trim() || '';
+                    });
+                    padronData.push(record);
+                }
+            }
+        }
+
+        function searchPadron(event) {
+            event.preventDefault();
+            
+            if (!isFileLoaded) {
+                alert('Por favor, cargá primero un archivo CSV');
+                return;
+            }
+
+            const searchCedula = document.getElementById('searchCedula').value.trim();
+            
+            if (!searchCedula) {
+                alert('Por favor, ingresá el número de cédula para buscar');
+                return;
+            }
+
+            const resultsSection = document.getElementById('resultsSection');
+            const searchResults = document.getElementById('searchResults');
+            
+            resultsSection.style.display = 'block';
+            searchResults.innerHTML = '<div class="loading"><div class="spinner"></div>Buscando...</div>';
+
+            setTimeout(() => {
+                const results = padronData.filter(record => {
+                    return record.cedula?.includes(searchCedula);
+                });
+
+                displayResults(results, searchCedula);
+                updateLastSearch(searchCedula);
+            }, 500);
+        }
+
+        function displayResults(results, searchTerm) {
+            const searchResults = document.getElementById('searchResults');
+            
+            if (results.length === 0) {
+                searchResults.innerHTML = `
+                    <div class="result-card not-found">
+                        <div class="result-status">
+                            <span class="status-icon">❌</span>
+                            No encontrado en el padrón
+                        </div>
+                        <p>No se encontraron registros para "${searchTerm}"</p>
+                        <p style="margin-top: 10px; color: #666;">Verificá que los datos sean correctos o contactá a las autoridades electorales.</p>
+                    </div>
+                `;
+            } else {
+                let html = '';
+                results.slice(0, 5).forEach(record => {
+                    html += `
+                        <div class="result-card">
+                            <div class="result-status">
+                                <span class="status-icon">✅</span>
+                                Encontrado en el padrón
+                            </div>
+                            <div class="result-details">
+                                ${Object.keys(record).map(key => `
+                                    <div class="detail-item">
+                                        <div class="detail-label">${capitalizeFirst(key)}:</div>
+                                        <div class="detail-value">${record[key] || 'N/A'}</div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    `;
+                });
+                
+                if (results.length > 5) {
+                    html += `<p style="text-align: center; color: #666; margin-top: 20px;">
+                        Se encontraron ${results.length} resultados. Mostrando los primeros 5.
+                    </p>`;
+                }
+                
+                searchResults.innerHTML = html;
+            }
+        }
+
+        function capitalizeFirst(str) {
+            return str.charAt(0).toUpperCase() + str.slice(1);
+        }
+
+        function updateStats() {
+            document.getElementById('totalRecords').textContent = padronData.length.toLocaleString();
+            document.getElementById('statsSection').style.display = 'grid';
+        }
+
+        function updateLastSearch(term) {
+            document.getElementById('lastSearch').textContent = term;
+        }
+    </script>
+</body>
+</html>
